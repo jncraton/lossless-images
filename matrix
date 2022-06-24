@@ -7,31 +7,46 @@ from time import perf_counter
 files = ["21.png"]
 
 with open("results.csv", "w", 1) as results:
-  results.write("image,qtable,quality,size,time,psnr\n")
-  for f in files:
-    for quality in [10, 20, 30, 50, 80]:
-      for qtable in ["0", "3", "2", "4", "6"]:
-        infile = "kodak/kodim" + f
-        outfile = "output/" + f.replace('.png', f"-{qtable}-{quality}.jpg")
-        print(f"Beginning encode for {outfile}")
-        start = perf_counter()
+    results.write("image,qtable,quality,size,time,psnr\n")
+    for f in files:
+        for quality in [10, 20, 30, 50, 80]:
+            for qtable in ["0", "3", "2", "4", "6"]:
+                infile = "kodak/kodim" + f
+                outfile = "output/" + f.replace(".png", f"-{qtable}-{quality}.jpg")
+                print(f"Beginning encode for {outfile}")
+                start = perf_counter()
 
-        output = run(
-          ["./cjpeg", "-quality", f"{quality}", "-quant-table", qtable, "-outfile", outfile, infile], 
-          capture_output=True)
+                output = run(
+                    [
+                        "./cjpeg",
+                        "-quality",
+                        f"{quality}",
+                        "-quant-table",
+                        qtable,
+                        "-outfile",
+                        outfile,
+                        infile,
+                    ],
+                    capture_output=True,
+                )
 
-        psnr = run(
-          ["compare", "-metric", "psnr", infile, outfile, "null"],
-          capture_output=True)
+                psnr = run(
+                    ["compare", "-metric", "psnr", infile, outfile, "null"],
+                    capture_output=True,
+                )
 
-        psnr = float(psnr.stderr.decode('utf8'))
+                psnr = float(psnr.stderr.decode("utf8"))
 
-        size = int(run(
-          ["stat", "--format", "%s", outfile],
-          capture_output=True).stdout.decode('utf8'))
+                size = int(
+                    run(
+                        ["stat", "--format", "%s", outfile], capture_output=True
+                    ).stdout.decode("utf8")
+                )
 
-        time = perf_counter() - start
+                time = perf_counter() - start
 
-        print(f"{infile} {qtable} {size} {time} {psnr}")
+                print(f"{infile} {qtable} {size} {time} {psnr}")
 
-        results.write(f"{infile},{qtable},{quality},{size},{time:.2f},{psnr:.2f}\n")
+                results.write(
+                    f"{infile},{qtable},{quality},{size},{time:.2f},{psnr:.2f}\n"
+                )
