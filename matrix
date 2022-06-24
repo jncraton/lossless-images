@@ -7,10 +7,10 @@ from time import perf_counter
 files = ["21.png"]
 
 with open("results.csv", "w", 1) as results:
-    results.write("image,qtable,quality,size,time,psnr\n")
+    results.write("image,qtable,quality,size,time,butteraugli\n")
     for f in files:
-        for quality in [10, 20, 30, 50, 80]:
-            for qtable in ["0", "3", "2", "4", "6"]:
+        for quality in range(0,90,5):
+            for qtable in ["3","6"]:
                 infile = "kodak/kodim" + f
                 outfile = "output/" + f.replace(".png", f"-{qtable}-{quality}.jpg")
                 print(f"Beginning encode for {outfile}")
@@ -31,11 +31,11 @@ with open("results.csv", "w", 1) as results:
                 )
 
                 psnr = run(
-                    ["compare", "-metric", "psnr", infile, outfile, "/dev/null"],
+                    ["butteraugli", infile, outfile],
                     capture_output=True,
                 )
 
-                psnr = float(psnr.stderr.decode("utf8"))
+                psnr = float(psnr.stdout.decode("utf8"))
 
                 size = int(
                     run(
