@@ -31,7 +31,7 @@ with open("results.csv", "w", 1) as results:
                 )
 
                 psnr = run(
-                    ["compare", "-metric", "psnr", infile, outfile, "null"],
+                    ["compare", "-metric", "psnr", infile, outfile, "/dev/null"],
                     capture_output=True,
                 )
 
