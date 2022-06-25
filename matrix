@@ -49,16 +49,15 @@ with open("results.csv", "w", 1) as results:
                       ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", outfile, "-r", "24", "-pix_fmt", "yuv422p", y4m],
                   )
 
-                  cambi = run(
+                  vmaf_output = run(
                       ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "--output", "/dev/stdout"],
                       capture_output=True,
                   )
 
-                  cambi = json.loads(cambi.stdout.decode("utf8"))['pooled_metrics']['cambi']['mean']
-                  cambi = float(cambi)
+                  vmaf_obj = json.loads(vmaf_output.stdout.decode("utf8"))
 
-                  vmaf = json.loads(cambi.stdout.decode("utf8"))['pooled_metrics']['cambi']['mean']
-                  vmaf = float(vmaf)
+                  cambi = float(vmaf_obj['pooled_metrics']['cambi']['mean'])
+                  vmaf = float(vmaf_obj['pooled_metrics']['cambi']['mean'])
 
                   size = int(
                       run(
