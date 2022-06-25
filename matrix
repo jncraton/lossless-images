@@ -12,66 +12,67 @@ import cv2
 files = ["21.png"]
 
 with open("results.csv", "w", 1) as results:
-    results.write("image,qtable,quality,size,time,mse,psnr,ssim,cambi\n")
+    results.write("image,encoder,qtable,quality,size,time,mse,psnr,ssim,cambi\n")
     for f in files:
-        for quality in range(0,102,2):
-            for qtable in ["2", "3", "6"]:
-                infile = "kodak/kodim" + f
-                outfile = "output/" + f.replace(".png", f"-{qtable}-{quality}.jpg")
-                print(f"Beginning encode for {outfile}")
-                start = perf_counter()
+      for quality in range(0,40,2):
+          for qtable in ["3"]:
+              for encoder in ["cjpeg", "cjpeg-clamp"]:
+                  infile = "kodak/kodim" + f
+                  outfile = "output/" + f.replace(".png", f"-{encoder}-{qtable}-{quality}.jpg")
+                  print(f"Beginning encode for {outfile}")
+                  start = perf_counter()
 
-                output = run(
-                    [
-                        "./cjpeg",
-                        "-quality",
-                        f"{quality}",
-                        "-quant-table",
-                        qtable,
-                        "-outfile",
-                        outfile,
-                        infile,
-                    ],
-                    capture_output=True,
-                )
+                  output = run(
+                      [
+                          f"./{encoder}",
+                          "-quality",
+                          f"{quality}",
+                          "-quant-table",
+                          qtable,
+                          "-outfile",
+                          outfile,
+                          infile,
+                      ],
+                      capture_output=True,
+                  )
 
-                #psnr = run(
-                #    ["butteraugli", infile, outfile],
-                #    capture_output=True,
-                #)
-                #psnr = float(psnr.stdout.decode("utf8"))
+                  #psnr = run(
+                  #    ["butteraugli", infile, outfile],
+                  #    capture_output=True,
+                  #)
+                  #psnr = float(psnr.stdout.decode("utf8"))
 
-                y4m = outfile + '.y4m'
+                  y4m = outfile + '.y4m'
 
-                run(
-                    ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", outfile, "-r", "24", "-pix_fmt", "yuv422p", y4m],
-                )
+                  run(
+                      ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", outfile, "-r", "24", "-pix_fmt", "yuv422p", y4m],
+                  )
 
-                cambi = run(
-                    ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "-n", "--output", "/dev/stdout"],
-                    capture_output=True,
-                )
+                  cambi = run(
+                      ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "-n", "--output", "/dev/stdout"],
+                      capture_output=True,
+                  )
 
-                cambi = json.loads(cambi.stdout.decode("utf8"))['pooled_metrics']['cambi']['mean']
-                cambi = float(cambi)
+                  cambi = json.loads(cambi.stdout.decode("utf8"))['pooled_metrics']['cambi']['mean']
+                  cambi = float(cambi)
 
-                size = int(
-                    run(
-                        ["stat", "--format", "%s", outfile], capture_output=True
-                    ).stdout.decode("utf8")
-                )
+                  size = int(
+                      run(
+                          ["stat", "--format", "%s", outfile], capture_output=True
+                      ).stdout.decode("utf8")
+                  )
 
-                time = perf_counter() - start
+                  time = perf_counter() - start
 
-                im1 = cv2.imread(infile)
-                im2 = cv2.imread(outfile)
+                  im1 = cv2.imread(infile)
+                  im2 = cv2.imread(outfile)
 
-                ssim = structural_similarity(im1, im2, channel_axis=2)
-                psnr = peak_signal_noise_ratio(im1, im2)
-                mse = mean_squared_error(im1, im2)
+                  ssim = structural_similarity(im1, im2, channel_axis=2)
+                  psnr = peak_signal_noise_ratio(im1, im2)
+                  mse = mean_squared_error(im1, im2)
 
-                print(f"{infile} {qtable} {size} {time} {psnr} {cambi}")
+                  print(f"{infile} {qtable} {size} {time} {psnr} {cambi}")
 
-                results.write(
-                    f"{infile},{qtable},{quality},{size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.2f},{cambi:.2f}\n"
-                )
+                  results.write(
+                      f"{infile},{encoder},{qtable},{quality},{size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.2f},{cambi:.2f}\n"
+                  )
