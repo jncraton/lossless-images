@@ -48,7 +48,6 @@ with open("results.csv", "w", 1) as results:
           for quality in range(10,52,2):
               for encoder in ["cjpeg", "cjpeg-clamp-dc"]:
                   outfile = "output/" + f.replace(".png", f"-{encoder}-{qtable}-{quality}.jpg")
-                  print(f"Beginning encode for {outfile}")
                   start = perf_counter()
 
                   output = run(
