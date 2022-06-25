@@ -50,7 +50,7 @@ with open("results.csv", "w", 1) as results:
                   )
 
                   vmaf_output = run(
-                      ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "--output", "/dev/stdout"],
+                      ["./vmaf", "--reference", reference, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "--output", "/dev/stdout"],
                       capture_output=True,
                   )
 
