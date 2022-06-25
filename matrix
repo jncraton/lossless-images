@@ -43,12 +43,6 @@ with open("results.csv", "w", 1) as results:
                       capture_output=True,
                   )
 
-                  #psnr = run(
-                  #    ["butteraugli", infile, outfile],
-                  #    capture_output=True,
-                  #)
-                  #psnr = float(psnr.stdout.decode("utf8"))
-
                   y4m = outfile + '.y4m'
 
                   run(
