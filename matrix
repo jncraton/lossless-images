@@ -14,8 +14,8 @@ files = ["21.png"]
 with open("results.csv", "w", 1) as results:
     results.write("image,qtable,quality,size,time,mse,psnr,ssim,cambi\n")
     for f in files:
-        for quality in range(0,100,2):
-            for qtable in ["2", "3"]:
+        for quality in range(0,102,2):
+            for qtable in ["2", "3", "6"]:
                 infile = "kodak/kodim" + f
                 outfile = "output/" + f.replace(".png", f"-{qtable}-{quality}.jpg")
                 print(f"Beginning encode for {outfile}")
@@ -48,7 +48,7 @@ with open("results.csv", "w", 1) as results:
                 )
 
                 cambi = run(
-                    ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi", "--json", "-n", "--output", "/dev/stdout"],
+                    ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "-n", "--output", "/dev/stdout"],
                     capture_output=True,
                 )
 
