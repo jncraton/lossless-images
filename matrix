@@ -57,7 +57,7 @@ with open("results.csv", "w", 1) as results:
                   vmaf_obj = json.loads(vmaf_output.stdout.decode("utf8"))
 
                   cambi = float(vmaf_obj['pooled_metrics']['cambi']['mean'])
-                  vmaf = float(vmaf_obj['pooled_metrics']['cambi']['mean'])
+                  vmaf = float(vmaf_obj['pooled_metrics']['vmaf']['mean'])
 
                   size = int(
                       run(
