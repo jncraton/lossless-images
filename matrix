@@ -12,7 +12,7 @@ import cv2
 files = [f"{i:02}.png" for i in range(1,25)]
 
 with open("results.csv", "w", 1) as results:
-    results.write("image,output,encoder,qtable,quality,size,time,mse,psnr,ssim,cambi,vmaf\n")
+    results.write("image,output,encoder,qtable,quality,size,rel_size,time,mse,psnr,ssim,cambi,vmaf\n")
     for f in files:
       infile = "kodak/kodim" + f
 
@@ -22,9 +22,31 @@ with open("results.csv", "w", 1) as results:
           ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", infile, "-r", "24", "-pix_fmt", "yuv422p", reference],
       )
 
-      for quality in range(10,50,2):
-          for qtable in ["3"]:
-              for encoder in ["cjpeg", "cjpeg-clamp-dc-9", "cjpeg-clamp-dc-10", "cjpeg-clamp-dc-12", "cjpeg-clamp-dc-16"]:
+      for qtable in ["0","2","3","4","6"]:
+          # Run initial encode at q50 to get size basis
+
+          size_ref_file = "output/" + f + f"{qtable}-size-reference.jpg"
+          run(
+              [
+                  "./cjpeg",
+                  "-quality",
+                  "50",
+                  "-quant-table",
+                  qtable,
+                  "-outfile",
+                  size_ref_file,
+                  infile,
+              ]
+          )
+
+          ref_size = int(
+              run(
+                  ["stat", "--format", "%s", size_ref_file], capture_output=True
+              ).stdout.decode("utf8")
+          )
+
+          for quality in range(10,52,2):
+              for encoder in ["cjpeg", "cjpeg-clamp-dc"]:
                   outfile = "output/" + f.replace(".png", f"-{encoder}-{qtable}-{quality}.jpg")
                   print(f"Beginning encode for {outfile}")
                   start = perf_counter()
@@ -65,6 +87,8 @@ with open("results.csv", "w", 1) as results:
                       ).stdout.decode("utf8")
                   )
 
+                  rel_size = size / ref_size
+
                   time = perf_counter() - start
 
                   im1 = cv2.imread(infile)
@@ -77,5 +101,5 @@ with open("results.csv", "w", 1) as results:
                   print(f"{infile} {qtable} {size} {time} {psnr} {cambi}")
 
                   results.write(
-                      f"{infile},{outfile},{encoder},{qtable},{quality},{size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.3f},{cambi:.2f},{vmaf:.2f}\n"
+                      f"{infile},{outfile},{encoder},{qtable},{quality},{size},{rel_size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.3f},{cambi:.2f},{vmaf:.2f}\n"
                   )
