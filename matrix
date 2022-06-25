@@ -14,9 +14,9 @@ files = ["21.png"]
 with open("results.csv", "w", 1) as results:
     results.write("image,encoder,qtable,quality,size,time,mse,psnr,ssim,cambi\n")
     for f in files:
-      for quality in range(0,40,2):
-          for qtable in ["3"]:
-              for encoder in ["cjpeg", "cjpeg-clamp"]:
+      for quality in range(0,101,1):
+          for qtable in ["0","2","3","4","6"]:
+              for encoder in ["cjpeg", "cjpeg-clamp-dc-9", "cjpeg-clamp-dc-10", "cjpeg-clamp-dc-11", "cjpeg-clamp-dc-12"]:
                   infile = "kodak/kodim" + f
                   outfile = "output/" + f.replace(".png", f"-{encoder}-{qtable}-{quality}.jpg")
                   print(f"Beginning encode for {outfile}")
@@ -74,5 +74,5 @@ with open("results.csv", "w", 1) as results:
                   print(f"{infile} {qtable} {size} {time} {psnr} {cambi}")
 
                   results.write(
-                      f"{infile},{encoder},{qtable},{quality},{size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.2f},{cambi:.2f}\n"
+                      f"{infile},{encoder},{qtable},{quality},{size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.3f},{cambi:.2f}\n"
                   )
