@@ -22,9 +22,9 @@ with open("results.csv", "w", 1) as results:
           ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", infile, "-r", "24", "-pix_fmt", "yuv422p", reference],
       )
 
-      for quality in range(0,40,2):
+      for quality in range(10,50,2):
           for qtable in ["3"]:
-              for encoder in ["cjpeg", "cjpeg-clamp-dc-9", "cjpeg-clamp-dc-10", "cjpeg-clamp-dc-11", "cjpeg-clamp-dc-12"]:
+              for encoder in ["cjpeg", "cjpeg-clamp-dc-9", "cjpeg-clamp-dc-10", "cjpeg-clamp-dc-12", "cjpeg-clamp-dc-16"]:
                   outfile = "output/" + f.replace(".png", f"-{encoder}-{qtable}-{quality}.jpg")
                   print(f"Beginning encode for {outfile}")
                   start = perf_counter()
