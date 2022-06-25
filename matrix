@@ -9,7 +9,7 @@ from skimage.metrics import structural_similarity, peak_signal_noise_ratio, mean
 
 import cv2
 
-files = ["21.png"]
+files = ["14.png", "21.png", "23.png"]
 
 with open("results.csv", "w", 1) as results:
     results.write("image,encoder,qtable,quality,size,time,mse,psnr,ssim,cambi,vmaf\n")
