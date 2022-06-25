@@ -1,2 +1,4 @@
-results.csv
-cjpeg
+*.csv
+cjpeg*
+vmaf
+.ipynb_checkpoints/
