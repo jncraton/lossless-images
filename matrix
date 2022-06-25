@@ -12,12 +12,19 @@ import cv2
 files = ["21.png"]
 
 with open("results.csv", "w", 1) as results:
-    results.write("image,encoder,qtable,quality,size,time,mse,psnr,ssim,cambi\n")
+    results.write("image,encoder,qtable,quality,size,time,mse,psnr,ssim,cambi,vmaf\n")
     for f in files:
-      for quality in range(0,101,1):
-          for qtable in ["0","2","3","4","6"]:
+      infile = "kodak/kodim" + f
+
+      reference = "output/" + f + "-reference.y4m"
+
+      run(
+          ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", infile, "-r", "24", "-pix_fmt", "yuv422p", reference],
+      )
+
+      for quality in range(0,40,2):
+          for qtable in ["3"]:
               for encoder in ["cjpeg", "cjpeg-clamp-dc-9", "cjpeg-clamp-dc-10", "cjpeg-clamp-dc-11", "cjpeg-clamp-dc-12"]:
-                  infile = "kodak/kodim" + f
                   outfile = "output/" + f.replace(".png", f"-{encoder}-{qtable}-{quality}.jpg")
                   print(f"Beginning encode for {outfile}")
                   start = perf_counter()
@@ -49,12 +56,15 @@ with open("results.csv", "w", 1) as results:
                   )
 
                   cambi = run(
-                      ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "-n", "--output", "/dev/stdout"],
+                      ["./vmaf", "--reference", y4m, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "--output", "/dev/stdout"],
                       capture_output=True,
                   )
 
                   cambi = json.loads(cambi.stdout.decode("utf8"))['pooled_metrics']['cambi']['mean']
                   cambi = float(cambi)
+
+                  vmaf = json.loads(cambi.stdout.decode("utf8"))['pooled_metrics']['cambi']['mean']
+                  vmaf = float(vmaf)
 
                   size = int(
                       run(
@@ -74,5 +84,5 @@ with open("results.csv", "w", 1) as results:
                   print(f"{infile} {qtable} {size} {time} {psnr} {cambi}")
 
                   results.write(
-                      f"{infile},{encoder},{qtable},{quality},{size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.3f},{cambi:.2f}\n"
+                      f"{infile},{encoder},{qtable},{quality},{size},{time:.2f},{mse:.2f},{psnr:.2f},{ssim:.3f},{cambi:.2f},{vmaf:.2f}\n"
                   )
