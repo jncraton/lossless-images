@@ -25,7 +25,7 @@ with open("results.csv", "w", 1) as results:
       for qtable in ["0","2","3","4","6"]:
           # Run initial encode at q50 to get size basis
 
-          size_ref_file = "output/" + f + f"{qtable}-size-reference.jpg"
+          size_ref_file = "output/" + f + f"-{qtable}-size-reference.jpg"
           run(
               [
                   "./cjpeg",
@@ -71,7 +71,7 @@ with open("results.csv", "w", 1) as results:
                   )
 
                   vmaf_output = run(
-                      ["./vmaf", "--reference", reference, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5", "--json", "--output", "/dev/stdout"],
+                      ["./vmaf", "--reference", reference, "--distorted", y4m, "--feature", "cambi=max_log_contrast=5:tvi_threshold=0.1", "--json", "--output", "/dev/stdout"],
                       capture_output=True,
                   )
 
