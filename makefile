@@ -8,4 +8,4 @@ vmaf:
 	chmod 755 vmaf
 
 clean:
-	rm -f output/*.jpg output/*.y4m results.csv vmaf
+	rm -f output/*.jpg output/*.y4m vmaf
