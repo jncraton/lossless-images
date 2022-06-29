@@ -2,3 +2,5 @@
 cjpeg*
 vmaf
 .ipynb_checkpoints/
+examples/
+*.ipynb
